@@ -112,7 +112,7 @@ function cabin() {
   const left = { x: CABIN.x, y: CABIN.y, w: WALL_T, d: CABIN.d, r: 2 };
   const right = { x: CABIN.x + CABIN.w - WALL_T, y: CABIN.y, w: WALL_T, d: CABIN.d, r: 2 };
   for (const wall of [back, left]) {
-    out.push(S(k.slabOf(wall, WALL_Z0, WALL_Z1 - WALL_Z0, P, 3, 0.7), { tone: "mid", inner: L(k.sideSeam(wall, 26, P, 3), { tone: "faint" }) }));
+    out.push(S(k.slabOf(wall, WALL_Z0, WALL_Z1 - WALL_Z0, P, 3, 0.7), { tone: "mid", inner: L(k.sideSeam(wall, 12, P, 3), { tone: "faint" }) }));
   }
   // lever frame with its builder-call label
   out.push(S(k.slabOf(FRAME, WALL_Z0, FRAME_Z, P, 3, 0.6), { tone: "mid" }));
@@ -128,17 +128,17 @@ function cabin() {
     out.push(`<g data-part="lever${i}-off">${leverSvg(lx, false)}</g>`);
     out.push(`<g data-part="lever${i}-on" style="display:none">${leverSvg(lx, true)}</g>`);
   });
-  // right wall with a window band
+  // right wall with a glazed window band
   out.push(
     S(k.slabOf(right, WALL_Z0, WALL_Z1 - WALL_Z0, P, 3, 0.7), {
       tone: "mid",
-      inner: L(k.sideSeam(right, 26, P, 3), { tone: "faint" }),
+      inner: L(k.sideSeam(right, 12, P, 3), { tone: "faint" }),
     }),
   );
   const face = right.x + right.w + 0.1;
-  out.push(L(k.segment([face, right.y, 18], [face, right.y + right.d, 18], P), { tone: "lo" }));
-  for (const my of [-68, -59, -50]) {
-    out.push(L(k.rise([face, my, 18], 18, WALL_Z1, P), { tone: "lo" }));
+  out.push(L(k.pathOf([at([face, -71, 14]), at([face, -47, 14]), at([face, -47, 26]), at([face, -71, 26])], true), { tone: "lo" }));
+  for (const my of [-66.5, -59, -51.5]) {
+    out.push(L(k.segment([face, my, 14], [face, my, 26], P), { tone: "lo" }));
   }
   // roof
   out.push(S(k.slabOf(ROOF, ROOF_Z, ROOF_H, P, 3, 1.2), { tone: "mid" }));

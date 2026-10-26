@@ -40,7 +40,7 @@ const POOL = { x: -146, y: -59, w: 26, d: 16, r: 2 };
 const POOL_FLOOR = 40.2;
 const POOL_WALL_H = 3.4;
 
-const FEED_A = [-131.5, -52.5, 44.2];     // feed rail: pool stack to funnel rim
+const FEED_A = [-131.5, -52.5, 43.6];     // feed rail: pool stack to funnel rim
 const FEED_B = [-118.3, -42.7, 34.6];
 
 const CHUTE_A = [-101.5, -30.8, 24.2];    // rail centre line, head slot to deck
@@ -70,13 +70,13 @@ const GUTTER = { x: 134, y: -58, w: 14, d: 94, r: 1.5 };
 const GUTTER_TOP = 4.8;
 
 const MOUTH = [142, -52];
-const NOZZLE_END = [-131.5, -51.5, 46.2];
+const NOZZLE_END = [-133, -51.5, 47.6];
 
 const BLOWER = { x: 134, y: -76, w: 14, d: 12, r: 2 };
 
 const TUBE_ROUTE = [
   [142, -52, 5.4], [142, -55, 7.8], [142, -59, 10.6], [112, -64, 17], [30, -66, 29.5],
-  [-52, -62.5, 41.5], [-113, -57, 48.4], [-128, -54.5, 48.4], [-131, -52.5, 47.6], NOZZLE_END,
+  [-52, -62.5, 41.5], [-113, -57, 48.4], [-128, -54.5, 48.4], [-132.5, -53, 48.2], NOZZLE_END,
 ];
 
 const BRIDGE_AT = -40;
@@ -173,8 +173,8 @@ const LANE_PTS = [
   ],
 ];
 
-const TUBE_COIN_TAIL = TUBE_ROUTE.slice(1).map((p) => [p[0], p[1], p[2] + 0.2]);
-const LANE_TAILS = LANE_PTS.map((pts) => [...pts, ...TUBE_COIN_TAIL, [-131, -51.8, 45.9], [-131, -51.8, 45.6]]);
+const TUBE_COIN_TAIL = TUBE_ROUTE.slice(1, -1).map((p) => [p[0], p[1], p[2] + 0.2]);
+const LANE_TAILS = LANE_PTS.map((pts) => [...pts, ...TUBE_COIN_TAIL, [-133, -51.5, 47.0], [-131.5, -51.7, 45.9], [-131, -51.8, 45.6]]);
 
 function screenPath(points, radius = 2.5) {
   const dense = G.resample(G.fillet(points, radius, 8, { P, tube: 1.6 }), 1.5);
@@ -212,7 +212,7 @@ const S_STEM_OUT = sNear(HEAD_PATH, [-104.6, -32.4, 25.6]);
 const S_ANVIL = sNear(LANE_PATHS[0], [78, -18.6, 13.0]);
 const S_TRAY_HOLD = TRAYS.map((tray, i) => sNear(LANE_PATHS[i], tray.hold));
 const S_TUBE_IN = sNear(LANE_PATHS[0], [142, -52, 5.1]);
-const S_TUBE_OUT = sNear(LANE_PATHS[0], [-131, -51.8, 45.9]);
+const S_TUBE_OUT = sNear(LANE_PATHS[0], [-133, -51.5, 47.0]);
 
 // ---------------------------------------------------------------- assemblies
 
@@ -267,8 +267,8 @@ function pool() {
   const wall = (plan) => S(k.slabOf(plan, POOL_FLOOR + 1.2, POOL_WALL_H, P, 3, 0.3), { tone: "mid" });
   out.push(wall({ x: POOL.x, y: POOL.y, w: POOL.w, d: 1.6, r: 0.6 }));                       // back
   out.push(wall({ x: POOL.x, y: POOL.y, w: 1.6, d: POOL.d, r: 0.6 }));                       // left
-  out.push(wall({ x: POOL.x + POOL.w - 1.6, y: POOL.y, w: 1.6, d: 5.5, r: 0.6 }));            // right, back piece
-  out.push(wall({ x: POOL.x + POOL.w - 1.6, y: -47.5, w: 1.6, d: 4.5, r: 0.6 }));             // right, front piece (gap: feed exit)
+  out.push(wall({ x: POOL.x + POOL.w - 1.6, y: POOL.y, w: 1.6, d: 4.5, r: 0.6 }));            // right, back piece
+  out.push(wall({ x: POOL.x + POOL.w - 1.6, y: -46.5, w: 1.6, d: 3.5, r: 0.6 }));             // right, front piece (gap: feed exit)
   for (let i = 0; i < 3; i++) {
     out.push(coinSvg(-131.4 + i * 0.8, -53.6 - i * 0.5, POOL_FLOOR + 1.2 + i * 1.15));
   }
@@ -285,16 +285,17 @@ function returnTube() {
   out.push(L(k.ring(MOUTH[0], MOUTH[1], 2.1, GUTTER_TOP + 2.8, P, 20), { tone: "lo" }));
   out.push(S(k.cylinder(NOZZLE_END[0], NOZZLE_END[1], 2.4, NOZZLE_END[2] - 0.8, 2.2, P, 22, 0.4), { tone: "mid" }));
   out.push(L(k.ring(NOZZLE_END[0], NOZZLE_END[1], 1.5, NOZZLE_END[2] + 1.4, P, 16), { tone: "lo" }));
+  out.push(L(k.ring(NOZZLE_END[0], NOZZLE_END[1], 2.1, NOZZLE_END[2] - 0.8, P, 18), { tone: "lo" }));
   return out.join("");
 }
 
 function hopper() {
   const out = [];
-  for (const [lx, ly] of k.corners({ x: HOP.x - 9.5, y: HOP.y - 7.5, w: 19, d: 15 }, 0).sort((a, b) => k.depthOf([a[0], a[1], 0], P) - k.depthOf([b[0], b[1], 0], P))) {
+  for (const [lx, ly] of k.corners({ x: HOP.x - 8.5, y: HOP.y - 6.5, w: 17, d: 13 }, 0).sort((a, b) => k.depthOf([a[0], a[1], 0], P) - k.depthOf([b[0], b[1], 0], P))) {
     out.push(S(k.cylinder(lx, ly, 2.2, 0, 1.4, P, 14), { tone: "lo" }));
-    out.push(S(k.cylinder(lx, ly, 1.5, 0, 33.7, P, 12), { tone: "mid", crease: "none" }));
+    out.push(S(k.cylinder(lx, ly, 1.5, 0, 31.7, P, 12), { tone: "mid", crease: "none" }));
   }
-  out.push(L(k.ring(HOP.x, HOP.y, 12.1, 14, P, 44), { tone: "faint" }));
+  out.push(L(k.ring(HOP.x, HOP.y, 10.7, 14, P, 40), { tone: "faint" }));
   out.push(S(G.lathe(FUN_PROFILE, FUN, P, { steps: 56 }), { tone: "mid" }));
   out.push(S(G.ringBand(10.2, 11.3, 12.5, 13.3, FUN, P, { steps: 56 }), { tone: "mid" }));
   out.push(S(k.cylinder(HOP.x, HOP.y, 12.4, FUN_TOP + 0.1, 0.5, P, 44), { tone: "lo", crease: "none" }));
@@ -340,7 +341,7 @@ function bridge() {
   out.push(L(k.ring(gx, gy, GAUGE.r - 0.6, GAUGE.z1, P, 44), { tone: "lo" }));
   const ticks = k.radialTicks(gx, gy, GAUGE.r - 1.3, 20, 4, GAUGE.z1, [0.9, 1.8], P);
   out.push(L(ticks.minor, { tone: "lo" }), L(ticks.major, { tone: "mid" }));
-  out.push(k.faceTextSvg(k.topMatrix([gx, gy + 3.6], GAUGE.z1, P, "x"), "GLYPH 11", { size: 1.25, tone: "mid", anchor: "middle" }));
+  out.push(k.faceTextSvg(k.topMatrix([gx, gy + 3.6], GAUGE.z1, P, "x"), "GLYPH 11", { size: 1.4, tone: "mid", anchor: "middle" }));
   GAUGE.x = gx;
   GAUGE.y = gy;
   return out.join("");
@@ -574,7 +575,7 @@ function tick(now) {
   theta += (-0.7 + 2.3 * pulse - theta) * (1 - Math.exp(-dt * 7));
   pl += ((phase === 1 && lane === 0 && Math.abs(s - S_ANVIL) < 26 ? 1 : 0) - pl) * (1 - Math.exp(-dt * 11));
   if (touring) {
-    let vt = 46;
+    let vt = 62;
     if (now < holdUntil) vt = 0;
     for (const hold of holds) if (!hold[2] && hold[0] - s < 26 && hold[0] - s > -2) vt = Math.min(vt, 12);
     v += (vt - v) * (1 - Math.exp(-dt * 7));
