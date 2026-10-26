@@ -283,12 +283,12 @@ function tick(now) {
   const dt = last ? Math.min((now - last) / 1000, 1 / 30) : 1 / 60;
   last = now;
   if (touring) { clock += dt; target = Math.floor(clock / 2.4) % STATIONS.length; }
+  active = target;
   const before = Math.floor(rot[active]);
   for (let i = 0; i < rot.length; i++) rot[i] += dt * (i === active ? 1.5 : 0.35);
   if (Math.floor(rot[active]) !== before) done += 1;
   draw();
-  const settled = !touring && active === target && rot[active] % 1 < 0.02;
-  frame = visible && !settled ? requestAnimationFrame(tick) : 0;
+  frame = visible && !still.matches ? requestAnimationFrame(tick) : 0;
 }
 const run = () => { if (!frame && visible) { last = 0; frame = requestAnimationFrame(tick); } };
 const steer = (next) => {
