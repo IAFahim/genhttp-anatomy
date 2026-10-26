@@ -121,7 +121,7 @@ function mast() {
     out.push(S(k.cylinder(wx, MAST[1], 0.5, armY + 1.4, 7, P, 10), { tone: "hi", crease: "none" }));
   }
   out.push(S(k.cylinder(MAST[0], MAST[1], 2.2, MAST_TOP, 1.6, P, 16), { tone: "hi" }));
-  for (const anchor of [[70, -18], [104, -22]]) {
+  for (const anchor of [[66, -12], [112, -24]]) {
     out.push(S(k.cylinder(anchor[0], anchor[1], 1.6, 0, 1.2, P, 12), { tone: "lo" }));
   }
   return out.join("");
@@ -216,8 +216,8 @@ const CORD_1 = [[-84, -55.4, 31.2], [-84, -53, 1.2], [-99, -53, 1.2], [-99, DESK
 const CORD_2 = [[-48, -55.4, 13.2], [-48, -51, 1.2], [-27, -51, 1.2], [-27, DESK_Y + 3.5, 1.2], [-27, DESK_Y + 3.5, 7.6], [-27, DESK_Y + 3.5, 7.6]];
 const CORD_M = [[80, -41, RADIO_H + 1], [80, -54, 1.2], [9, -54, 1.2], [9, -52, 1.8]];
 const CORD_3 = [[9, -50, 1.8], [9, 3, 1.8], [9, 3, 7.6], [9, DESK_Y + 3.5, 7.6], [9, DESK_Y + 3.5, 7.6]];
-const GUY_1 = [[MAST[0], MAST[1], MAST_TOP - 6], [70, -18, 1]];
-const GUY_2 = [[MAST[0], MAST[1], MAST_TOP - 6], [104, -22, 1]];
+const GUY_1 = [[MAST[0], MAST[1], MAST_TOP - 6], [66, -12, 1]];
+const GUY_2 = [[MAST[0], MAST[1], MAST_TOP - 6], [112, -24, 1]];
 
 const svg = k.figureSvg({
   width: WIDTH,
