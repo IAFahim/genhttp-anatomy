@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GenHTTP, drawn as machines</title>
+<meta name="description" content="Why GenHTTP is god tier: the architecture of the Ioxide engine and the handler tree, drawn as interactive isometric machines.">
+<style>
+:root{
+  --page:#0b0b0b;--card:#131313;--text:#a3a3a3;--strong:#e6e6e6;--muted:#6e6e6e;--line:#262626;--hair:#1d1d1d;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+:root[data-theme="light"]{
+  --page:#f2f2ef;--card:#fbfbfa;--text:#57575a;--strong:#18181a;--muted:#8c8c90;--line:#d8d8d4;--hair:#e4e4e0;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--text);font:15px/1.65 var(--sans);-webkit-font-smoothing:antialiased}
+main{max-width:880px;margin:72px auto 110px;padding:0 20px}
+.mono{font-family:var(--mono);letter-spacing:.08em;text-transform:uppercase}
+header .kicker{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+h1{font-family:var(--mono);font-weight:500;font-size:clamp(24px,4.4vw,38px);line-height:1.15;color:var(--strong);margin:.35em 0 .4em;letter-spacing:-.01em}
+header p{max-width:62ch;margin:0 0 10px}
+header .sub{color:var(--muted)}
+.rule{border:0;border-top:1px solid var(--line);margin:34px 0}
+.toolbar{float:right;font-family:var(--mono);font-size:11px;letter-spacing:.1em}
+.toolbar a{color:var(--muted);text-decoration:none;margin-left:14px}
+.toolbar a:hover,.toolbar a:focus-visible{color:var(--strong);outline:none}
+ol.figures{list-style:none;margin:0;padding:0}
+ol.figures li{border:1px solid var(--hair);background:var(--card);border-radius:10px;padding:20px 22px 16px;margin-bottom:14px}
+.figticket{display:flex;gap:8px;align-items:baseline}
+.figtick{font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--muted)}
+h2{font-family:var(--mono);font-weight:500;font-size:17px;color:var(--strong);margin:0}
+.say{margin:7px 0 12px;max-width:70ch}
+.links{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase}
+.links a{color:var(--muted);text-decoration:none;border:1px solid var(--hair);border-radius:6px;padding:4px 9px;margin-right:8px;display:inline-block;margin-bottom:4px}
+.links a:hover,.links a:focus-visible{color:var(--strong);border-color:var(--line);outline:none}
+footer{color:var(--muted);font-size:13px}
+footer a{color:var(--muted)}
+footer a:hover{color:var(--strong)}
+@media (max-width:640px){ main{margin-top:48px} .toolbar{float:none;display:block;margin-bottom:18px} .toolbar a:first-child{margin-left:0} }
+</style>
+</head>
+<body>
+<main>
+<header>
+  <div class="toolbar mono"><a href="#" id="theme">light</a><a href="https://github.com/IAFahim/genhttp-anatomy">repo</a></div>
+  <div class="kicker">Anatomy of a web server · eight machines</div>
+  <h1>GenHTTP, drawn as machines</h1>
+  <p>GenHTTP is a C# web server whose <strong>Ioxide</strong> engine puts the socket work in the kernel: one io_uring reactor per core, kTLS, zero copies, HTTP/3, all behind the same four-method handler contract as the little embedded server it started as.</p>
+  <p class="sub">Each machine below is an interactive isometric figure. Hover it. Every part is drawn to the same truth as the code — the companion notes for each figure live in <a href="https://github.com/IAFahim/genhttp-anatomy/tree/main/docs"><span class="mono">docs/</span></a>, starting with <a href="https://github.com/IAFahim/genhttp-anatomy/blob/main/docs/00-why-genhttp-is-god-tier.md">why GenHTTP is god tier</a>.</p>
+</header>
+
+<hr class="rule">
+
+<ol class="figures">
+  <li>
+    <div class="figticket"><span class="figtick">Fig 1</span><h2>Ioxide — the io_uring exchange</h2></div>
+    <p class="say">A telephone exchange: the call arrives at the panel, an operator (a reactor) picks it up, and the kernel — not the thread — holds the connection while the work is done.</p>
+    <div class="links"><a href="figures/01-ioxide-exchange/">open</a><a href="figures/01-ioxide-exchange/index-light.html">light</a><a href="https://github.com/IAFahim/genhttp-anatomy/blob/main/docs/01-the-iooxide-core.md">notes</a></div>
+  </li>
+  <li>
+    <div class="figticket"><span class="figtick">Fig 2</span><h2>The zero-alloc exchange</h2></div>
+    <p class="say">A coin sorter: every request is a coin, and the gate decides — pooled request objects, memory-view headers with precomputed hashes, nothing handed to the garbage collector on the hot path.</p>
+    <div class="links"><a href="figures/02-coin-sorter/">open</a><a href="figures/02-coin-sorter/index-light.html">light</a><a href="https://github.com/IAFahim/genhttp-anatomy/blob/main/docs/02-the-zero-alloc-exchange.md">notes</a></div>
+  </li>
+  <li>
+    <div class="figticket"><span class="figtick">Fig 3</span><h2>The handler tree</h2></div>
+    <p class="say">A signal box: points decide which track a request takes, and every track ends somewhere — a resource, or the error handler that catches whatever falls through.</p>
+    <div class="links"><a href="figures/03-signal-box/">open</a><a href="figures/03-signal-box/index-light.html">light</a><a href="https://github.com/IAFahim/genhttp-anatomy/blob/main/docs/03-the-handler-tree.md">notes</a></div>
+  </li>
+  <li>
+    <div class="figticket"><span class="figtick">Fig 4</span><h2>The concern chain</h2></div>
+    <p class="say">A filter stack: concerns screw onto the content one after another, first on is outermost, and the request passes through each in turn.</p>
+    <div class="links"><a href="figures/04-filter-stack/">open</a><a href="figures/04-filter-stack/index-light.html">light</a><a href="https://github.com/IAFahim/genhttp-anatomy/blob/main/docs/04-the-concern-chain.md">notes</a></div>
+  </li>
+  <li>
+    <div class="figticket"><span class="figtick">Fig 5</span><h2>The reflection mapper</h2></div>
+    <p class="say">A card catalog: methods become index cards — path, verb, parameters — read from the assembly once and filed where the router can find them.</p>
+    <div class="links"><a href="figures/05-card-catalog/">open</a><a href="figures/05-card-catalog/index-light.html">light</a><a href="https://github.com/IAFahim/genhttp-anatomy/blob/main/docs/05-the-reflection-mapper.md">notes</a></div>
+  </li>
+  <li>
+    <div class="figticket"><span class="figtick">Fig 6</span><h2>The OpenAPI generator</h2></div>
+    <p class="say">A surveyor: the theodolite walks the handler tree, sights each operation, and drafts the specification sheet from what it measures — no annotations twice.</p>
+    <div class="links"><a href="figures/06-surveyor/">open</a><a href="figures/06-surveyor/index-light.html">light</a><a href="https://github.com/IAFahim/genhttp-anatomy/blob/main/docs/06-the-openapi-generator.md">notes</a></div>
+  </li>
+  <li>
+    <div class="figticket"><span class="figtick">Fig 7</span><h2>Freshness and size</h2></div>
+    <p class="say">A cloakroom: hand in a ticket (If-None-Match) and either your coat is still there — 304, nothing handed back — or you get it fresh, within the size the counter allows.</p>
+    <div class="links"><a href="figures/07-cloakroom/">open</a><a href="figures/07-cloakroom/index-light.html">light</a><a href="https://github.com/IAFahim/genhttp-anatomy/blob/main/docs/07-freshness-and-size.md">notes</a></div>
+  </li>
+  <li>
+    <div class="figticket"><span class="figtick">Fig 8</span><h2>The turntable</h2></div>
+    <p class="say">A engine shed turntable: three engines — Internal, Kestrel, Ioxide — on one pit; the deck turns and every coach (every test) couples to whichever engine is facing it.</p>
+    <div class="links"><a href="figures/08-turntable/">open</a><a href="figures/08-turntable/index-light.html">light</a><a href="https://github.com/IAFahim/genhttp-anatomy/blob/main/docs/08-the-turntable.md">notes</a></div>
+  </li>
+</ol>
+
+<hr class="rule">
+
+<footer>
+  <p><span class="mono">genhttp-anatomy</span> · MIT · figures built with the <a href="https://github.com/wheresryan22/anatomy">anatomy</a> isometric kit (MIT © 2026 Ryan) · see <span class="mono">NOTICE.md</span>.</p>
+</footer>
+</main>
+<script>
+const root = document.documentElement, btn = document.getElementById("theme");
+btn.addEventListener("click", (event) => {
+  event.preventDefault();
+  const light = root.getAttribute("data-theme") !== "light";
+  root.setAttribute("data-theme", light ? "light" : "dark");
+  btn.textContent = light ? "dark" : "light";
+});
+</script>
+</body>
+</html>
