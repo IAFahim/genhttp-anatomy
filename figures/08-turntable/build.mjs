@@ -179,7 +179,9 @@ function deckPiece(deg) {
     const b = rotated([PIT_C[0] + half - 4, PIT_C[1] + (sign * DECK_W) / 2, z0 + h], deg);
     out.push(L(k.segment(a, b, P), { tone: "lo" }));
     for (const t of [0.18, 0.5, 0.82]) {
-      out.push(L(k.rise([a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t], z0 + h, z0 + h + 3.4, P), { tone: "lo" }));
+      const px = a[0] + (b[0] - a[0]) * t;
+      const py = a[1] + (b[1] - a[1]) * t;
+      out.push(S(k.cylinder(px, py, 0.5, z0 + h, 3.4, P, 8), { tone: "mid", crease: "none" }));
     }
   }
   const pivot = rotated([PIT_C[0], PIT_C[1], 0], deg);
@@ -243,7 +245,9 @@ function deckPiece(deg) {
     const b = rotated([PIT_C[0] + half - 4, PIT_C[1] + (sign * DECK_W) / 2, z0 + h], deg);
     out.push(lineSvg(segment(a, b, P), { tone: "lo" }));
     for (const t of [0.18, 0.5, 0.82]) {
-      out.push(lineSvg(rise([a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t], z0 + h, z0 + h + 3.4, P), { tone: "lo" }));
+      const px = a[0] + (b[0] - a[0]) * t;
+      const py = a[1] + (b[1] - a[1]) * t;
+      out.push(solidSvg(cylinder(px, py, 0.5, z0 + h, 3.4, P, 8), { tone: "mid", crease: "none" }));
     }
   }
   const pivot = rotated([PIT_C[0], PIT_C[1], 0], deg);
@@ -279,14 +283,14 @@ function coachPiece(deg) {
 
 function fixtures() {
   const out = [];
-  const crane = [58, 58];
+  const crane = [-112, 68];
   out.push(S(k.cylinder(crane[0], crane[1], 4, 0, 2.4, P, 20), { tone: "mid" }));
   out.push(S(k.cylinder(crane[0], crane[1], 1.4, 2.4, 22, P, 12), { tone: "mid", crease: "none" }));
   out.push(S(k.slabOf({ x: crane[0] - 1.6, y: crane[1] - 16, w: 3.2, d: 15, r: 1 }, 21, 2.6, P, 2, 0.4), { tone: "hi", crease: "lo" }));
   out.push(S(k.cylinder(crane[0], crane[1] - 15, 1.6, 17.5, 3.6, P, 12), { tone: "hi", crease: "none" }));
   out.push(L(k.ring(crane[0], crane[1], 3.2, 24.4, P, 20), { tone: "lo" }));
   out.push(S(k.slabOf({ x: crane[0] + 6, y: crane[1] + 4, w: 5, d: 3.4, r: 0.8 }, 0, 2.6, P, 2), { tone: "mid" }));
-  const coal = [-108, -48];
+  const coal = [8, 96];
   out.push(S(k.slabOf({ x: coal[0] - 14, y: coal[1] - 9, w: 28, d: 18, r: 2 }, 0, 3, P, 3, 0.4), { tone: "mid" }));
   out.push(S(k.slabOf({ x: coal[0] - 10, y: coal[1] - 12, w: 20, d: 6, r: 1 }, 0, 1.2, P, 2, 0.3), { tone: "mid" }));
   for (let i = 0; i < 5; i++) {
