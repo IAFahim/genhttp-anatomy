@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import * as k from "../../kit/iso-kit.mjs";
 import * as G from "../../kit/lathe.mjs";
 import { kitScript } from "../../scripts/inline-kit.mjs";
+import { pdfButton } from "../../kit/pdf-button.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const theme = process.argv.includes("--light") ? "light" : "dark";
@@ -514,7 +515,7 @@ const body = k.plateHtml({
   ],
   caption:
     "Every front door — ServiceResource, Controller or an Inline lambda — ends in the same machinery: TypeAnalyzer reads the attributes into a MethodCollection and the OperationRouter matches the request card to one drawer. SignatureAnalyzer then binds each parameter by fixed precedence — path, injected, streamed, body, query, content — so a bead drops only into the slot the signature declares. The pen writes through a Roslyn-compiled Invoke when one can be generated and falls back to plain reflection otherwise, while an interceptor such as [RequireRole(\"admin\")] can short-circuit the call before the method runs.",
-  body: `<div class="iso-stage" tabindex="0" role="slider" aria-label="Card catalog: pick a method with the index plates or arrow keys" aria-valuemin="1" aria-valuemax="3" aria-valuenow="1">${svg}</div>`,
+  body: `${pdfButton(`card-catalog-detailed-a4.pdf`)}<div class="iso-stage" tabindex="0" role="slider" aria-label="Card catalog: pick a method with the index plates or arrow keys" aria-valuemin="1" aria-valuemax="3" aria-valuenow="1">${svg}</div>`,
 });
 
 writeFileSync(join(HERE, theme === "light" ? "index-light.html" : "index.html"), k.pageHtml({ title: "GenHTTP — the reflection mapper", theme, body, script: kitScript() + live }));

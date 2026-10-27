@@ -5,6 +5,7 @@ import * as k from "../../kit/iso-kit.mjs";
 import * as G from "../../kit/lathe.mjs";
 import { tubePieces, tubeSvg } from "../../kit/tube.mjs";
 import { kitScript } from "../../scripts/inline-kit.mjs";
+import { pdfButton } from "../../kit/pdf-button.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const theme = process.argv.includes("--light") ? "light" : "dark";
@@ -184,7 +185,7 @@ function station(cx) {
 }
 
 function stations() {
-  return STATIONS.map((cx) => station(cx)).join("");
+  return STATIONS.map((cx, i) => `<g data-part="station-${i + 1}">${station(cx)}</g>`).join("");
 }
 
 function ringDots(cx, rotFrac, litIndex) {
@@ -192,7 +193,8 @@ function ringDots(cx, rotFrac, litIndex) {
   const points = TICKETS.map((slot) => {
     const theta = ((slot + rotFrac) / SLOTS) * Math.PI * 2;
     const lit = TICKETS.indexOf(slot) === litIndex % TICKETS.length;
-    return [cx + (RING_R - 3.4) * Math.sin(theta), cy - (RING_R - 3.4) * Math.cos(theta), RING_Z + RING_H, lit ? 1 : 0.7];
+    const [sx, sy] = iso([cx + (RING_R - 3.4) * Math.sin(theta), cy - (RING_R - 3.4) * Math.cos(theta), RING_Z + RING_H], P);
+    return [sx, sy, lit ? 1 : 0.7];
   });
   return dotsSvg(points, { size: 1.0 });
 }
@@ -225,20 +227,20 @@ const svg = k.figureSvg({
   label:
     "A telephone exchange drawn as an engine: a base plate carries a trunk panel with two port plates and a kTLS block, a radio mast on its own box, a distribution block and a tray of pooled request cards. Four operator stations each carry a patch ring with ticket slots, a crank, a jack, a lamp and an on-duty flag. Patch cords run from the trunk ports and the radio feed to three of the stations; the fourth keeps its cord on a hook.",
   body: [
-    base(),
-    panel(),
-    mast(),
+    `<g data-part="plate">${base()}</g>`,
+    `<g data-part="panel">${panel()}</g>`,
+    `<g data-part="radio">${mast()}</g>`,
     stations(),
-    pool(),
-    stow(),
+    `<g data-part="pool">${pool()}</g>`,
+    `<g data-part="spare">${stow()}</g>`,
     `<g data-part="cord1">${cord(CORD_1)}</g>`,
     `<g data-part="cord2">${cord(CORD_2)}</g>`,
     `<g data-part="cordm">${cord(CORD_M)}</g>`,
     `<g data-part="guy1">${cord(GUY_1)}</g>`,
     `<g data-part="guy2">${cord(GUY_2)}</g>`,
-    S(k.slabOf(BLOCK, 0, BLOCK_H, P, 3, 0.5), { tone: "mid" }) + L(k.planOutline(k.insetPlan(BLOCK, 1.2), BLOCK_H, P), { tone: "lo" }),
+    `<g data-part="block">${S(k.slabOf(BLOCK, 0, BLOCK_H, P, 3, 0.5), { tone: "mid" })}${L(k.planOutline(k.insetPlan(BLOCK, 1.2), BLOCK_H, P), { tone: "lo" })}</g>`,
     `<g data-part="cord3">${cord(CORD_3)}</g>`,
-    hookedCord(-63),
+    `<g data-part="hook">${hookedCord(-63)}</g>`,
     `<g data-part="dots"></g>`,
   ],
 });
@@ -331,7 +333,7 @@ const body = k.plateHtml({
   ],
   caption:
     "Ioxide runs one reactor thread per core, each with its own io_uring ring of 8192 entries. Connections arrive on trunk ports — TCP with TLS (kernel TLS offload optional) and QUIC over UDP for HTTP/3 — and every reactor serves any of them. Each posted ticket is a submission; each lit one, a completion. Requests are pooled cards, dealt from the tray; the parser is Glyph11's hardened HTTP/1.1 + HTTP/2 reader. The rings never stop turning.",
-  body: `<div class="iso-stage" tabindex="0" role="slider" aria-label="Ioxide exchange: arrow keys hand the call between reactors" aria-valuemin="1" aria-valuemax="4" aria-valuenow="1">${svg}</div>`,
+  body: `${pdfButton(`ioxide-exchange-detailed-a4.pdf`)}<div class="iso-stage" tabindex="0" role="slider" aria-label="Ioxide exchange: arrow keys hand the call between reactors" aria-valuemin="1" aria-valuemax="4" aria-valuenow="1">${svg}</div>`,
 });
 
 writeFileSync(join(HERE, theme === "light" ? "index-light.html" : "index.html"), k.pageHtml({ title: "Ioxide — the io_uring exchange", theme, body, script: kitScript() + live }));

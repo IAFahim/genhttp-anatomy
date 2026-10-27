@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import * as k from "../../kit/iso-kit.mjs";
 import * as G from "../../kit/lathe.mjs";
 import { kitScript } from "../../scripts/inline-kit.mjs";
+import { pdfButton } from "../../kit/pdf-button.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const theme = process.argv.includes("--light") ? "light" : "dark";
@@ -320,8 +321,8 @@ const svg = k.figureSvg({
 </style>`,
     base(),
     rail(),
-    lamp(),
-    meter(),
+    `<g data-part="lamp">${lamp()}</g>`,
+    `<g data-part="meter">${meter()}</g>`,
     F_X.map((cx, i) => stationFrame(cx, i, i === 3)).join(""),
     `<g data-part="beam">${beamMarkup([1, 1, 1, 0], 1)}</g>`,
     `<g data-part="needle">${needleMarkup(0.27)}</g>`,
@@ -468,7 +469,7 @@ const body = k.plateHtml({
   ],
   caption:
     "A concern is a handler that owns its inner handler, and Concerns.Chain folds the builders around the tree: the first concern added becomes the outermost ring, so the order in source is the order a request meets. Here auth sits before CORS, compression and caching — close its shutter and nothing downstream sees light at all. The host builds its root the same way (compliance, errors, your concerns, logging), .Add(...) scopes a chain to one subtree, and host.Defaults(...) wires the common rings in one call — each one individually removable.",
-  body: `<div class="iso-stage" tabindex="0" role="group" aria-label="The concern chain as an optical bench: keys 1 to 4 seat or lift each filter ring">${svg}</div>`,
+  body: `${pdfButton(`filter-stack-detailed-a4.pdf`)}<div class="iso-stage" tabindex="0" role="group" aria-label="The concern chain as an optical bench: keys 1 to 4 seat or lift each filter ring">${svg}</div>`,
 });
 
 writeFileSync(join(HERE, theme === "light" ? "index-light.html" : "index.html"), k.pageHtml({ title: "The concern chain", theme, body, script: kitScript() + live }));

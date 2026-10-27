@@ -5,6 +5,7 @@ import * as k from "../../kit/iso-kit.mjs";
 import * as G from "../../kit/lathe.mjs";
 import { tubePieces, tubeSvg } from "../../kit/tube.mjs";
 import { kitScript } from "../../scripts/inline-kit.mjs";
+import { pdfButton } from "../../kit/pdf-button.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const theme = process.argv.includes("--light") ? "light" : "dark";
@@ -458,23 +459,21 @@ const svg = k.figureSvg({
     base(),
     gutter(),
     blower(),
-    pool(),
-    returnTube(),
-    hopper(),
+    `<g data-part="pool">${pool()}</g>`,
+    `<g data-part="tube">${returnTube()}</g>`,
+    `<g data-part="hopper">${hopper()}</g>`,
     feedRail(),
     chuteHead(),
     chute(),
-    bridge(),
+    `<g data-part="bridge">${bridge()}</g>`,
     `<g data-part="needle">${needleMarkup(NEEDLE_REST)}</g>`,
     L(k.ring(GAUGE.x, GAUGE.y, 1.5, GAUGE.z1 + 0.1, P, 14), { tone: "lo" }),
     D([at([GAUGE.x, GAUGE.y, GAUGE.z1 + 0.1])], { size: 0.6, tone: "mid" }),
     deck(),
     `<g data-part="flap">${flapSvg(FLAP_ANGLES[0])}</g>`,
     lanes(),
-    TRAYS.map((t) => tray(t)).join(""),
-    pressStatics(),
-    `<g data-part="plunger">${plungerSvg()}</g>`,
-    pressTop(),
+    TRAYS.map((t, i) => `<g data-part="tray-${i}">${tray(t)}</g>`).join(""),
+    `<g data-part="press">${pressStatics()}<g data-part="plunger">${plungerSvg()}</g>${pressTop()}</g>`,
     `<g data-part="coin">${coinSvg(0, 0, 0, true)}</g>`,
   ],
 });
@@ -630,6 +629,18 @@ stage.addEventListener("keydown", (event) => {
   steer(to);
 });
 draw();
+window.__fig = {
+  BRIDGE: S_BRIDGE, ANVIL: S_ANVIL, TRAY: ${JSON.stringify(S_TRAY_HOLD.map((v) => +v.toFixed(1)))},
+  pose(p, l, sv) {
+    touring = false; gateAuto = false;
+    phase = p; lane = l; gate = l; s = sv;
+    angle = ANGLES[lane];
+    pulse = phase === 0 ? Math.max(0, 1 - Math.abs(s - S_BRIDGE) / 42) : 0;
+    theta = -0.7 + 2.3 * pulse;
+    pl = phase === 1 && lane === 0 && Math.abs(s - S_ANVIL) < 26 ? 1 : 0;
+    draw();
+  },
+};
 `;
 
 // --------------------------------------------------------------------- card --
@@ -646,7 +657,7 @@ const body = k.plateHtml({
   ],
   caption:
     "Every exchange runs one coin round the machine. The reading bridge is Glyph11: headers become zero-copy ByteString views over the request buffer — no strings minted. The gate stands for the handler tree — a null answer drops the coin in the 404 tray, a thrown one is mapped — and the press is serialization: status line and headers as raw UTF-8, the body driven into a RegularSink or ChunkedSink. The return chute empties back into the pool: Requests live in a per-thread stack, up to 1024 deep, so minted stays at zero.",
-  body: `<div class="iso-stage" tabindex="0" role="slider" aria-label="Coin sorter: arrow keys steer the routing gate between handler, 404 and error" aria-valuemin="1" aria-valuemax="3" aria-valuenow="1">${svg}</div>`,
+  body: `${pdfButton(`coin-sorter-detailed-a4.pdf`)}<div class="iso-stage" tabindex="0" role="slider" aria-label="Coin sorter: arrow keys steer the routing gate between handler, 404 and error" aria-valuemin="1" aria-valuemax="3" aria-valuenow="1">${svg}</div>`,
 });
 
 writeFileSync(join(HERE, theme === "light" ? "index-light.html" : "index.html"), k.pageHtml({ title: "GenHTTP — the zero-alloc exchange", theme, body, script: kitScript() + live }));

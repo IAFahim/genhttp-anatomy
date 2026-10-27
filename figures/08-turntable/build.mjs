@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import * as k from "../../kit/iso-kit.mjs";
 import * as G from "../../kit/lathe.mjs";
 import { kitScript } from "../../scripts/inline-kit.mjs";
+import { pdfButton } from "../../kit/pdf-button.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const theme = process.argv.includes("--light") ? "light" : "dark";
@@ -307,15 +308,15 @@ const svg = k.figureSvg({
   label:
     "A locomotive turntable: a round pit set in an apron, a rotating bridge deck with handrails and an angle gauge carrying one coach, and three roads leading away to three different locomotives — a small tank engine, a heavy tender locomotive and a sleek diesel with a nose lamp.",
   body: [
-    base(),
-    pit(),
+    `<g data-part="shed">${base()}</g>`,
+    `<g data-part="pit">${pit()}</g>`,
     rails(150),
     rails(270),
     rails(30),
-    fixtures(),
-    engine(0),
-    engine(1),
-    engine(2),
+    `<g data-part="fixtures">${fixtures()}</g>`,
+    `<g data-part="engine-1">${engine(0)}</g>`,
+    `<g data-part="engine-2">${engine(1)}</g>`,
+    `<g data-part="engine-3">${engine(2)}</g>`,
     `<g data-part="deck">${deckPiece(150)}</g>`,
     `<g data-part="coach">${coachPiece(150)}</g>`,
   ],
@@ -404,7 +405,7 @@ const body = k.plateHtml({
   ],
   caption:
     "The same application couples to any of three engines through one IServerHost: the threaded Internal engine (HTTP/1.1, embedding), Kestrel (the ASP.NET edge), and Ioxide (io_uring on Linux, HTTP/1.1 to HTTP/3). The meta-packages differ only in the engine dependency, and every acceptance test runs against every engine.",
-  body: `<div class="iso-stage" tabindex="0" role="slider" aria-label="Engine turntable: arrow keys choose an engine" aria-valuemin="1" aria-valuemax="3" aria-valuenow="1">${svg}</div>`,
+  body: `${pdfButton(`turntable-detailed-a4.pdf`)}<div class="iso-stage" tabindex="0" role="slider" aria-label="Engine turntable: arrow keys choose an engine" aria-valuemin="1" aria-valuemax="3" aria-valuenow="1">${svg}</div>`,
 });
 
 writeFileSync(join(HERE, theme === "light" ? "index-light.html" : "index.html"), k.pageHtml({ title: "The turntable", theme, body, script: kitScript() + live }));

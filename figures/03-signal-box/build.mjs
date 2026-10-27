@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import * as k from "../../kit/iso-kit.mjs";
 import * as G from "../../kit/lathe.mjs";
 import { kitScript } from "../../scripts/inline-kit.mjs";
+import { pdfButton } from "../../kit/pdf-button.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const theme = process.argv.includes("--light") ? "light" : "dark";
@@ -233,7 +234,7 @@ function platform(road) {
 }
 
 function platforms() {
-  return ROADS.map((road) => platform(road)).join("");
+  return ROADS.map((road, i) => `<g data-part="platform-${road.label}">${platform(road)}</g>`).join("");
 }
 
 // ---------- signals ----------
@@ -306,11 +307,11 @@ const svg = k.figureSvg({
   label:
     "A railway signal box drawn as GenHTTP's handler tree. An open-front cabin with a four-lever builder frame stands behind a junction where the entry track crosses point blades and splits into three branch roads ending at platforms, with one short dead-end spur stopped by a buffer. Setting a route pulls its lever, swings the blades, drops that branch's signal arm and runs a small locomotive from the entry to the platform, or into the buffer when the null spur is set.",
   body: [
-    base(),
-    cabin(),
-    track(),
+    `<g data-part="base">${base()}</g>`,
+    `<g data-part="cabin">${cabin()}</g>`,
+    `<g data-part="track">${track()}</g>`,
     platforms(),
-    signals(),
+    `<g data-part="signals">${signals()}</g>`,
     `<g data-part="arms"></g>`,
     `<g data-part="blades"></g>`,
     loco(),
@@ -483,7 +484,7 @@ const body = k.plateHtml({
   ],
   caption:
     "Every part of GenHTTP is the same two-method IHandler: PrepareAsync warms the tree once before the first connection, HandleAsync answers the request. The lever frame is the builder — .Add(segment, handler) hangs a platform on each branch, .Index(handler) covers the root — and the points are the segment match. Three roads end at platforms that return a response; the dead spur is the null that the concern chain turns into a 404. At the root the layout even forces a trailing slash by redirecting, so no content is ever served at two URLs.",
-  body: `<div class="iso-stage" tabindex="0" role="slider" aria-label="Signal box: arrow keys or 1 to 4 set the points to a branch or the dead spur" aria-valuemin="1" aria-valuemax="4" aria-valuenow="1">${svg}</div>`,
+  body: `${pdfButton(`signal-box-detailed-a4.pdf`)}<div class="iso-stage" tabindex="0" role="slider" aria-label="Signal box: arrow keys or 1 to 4 set the points to a branch or the dead spur" aria-valuemin="1" aria-valuemax="4" aria-valuenow="1">${svg}</div>`,
 });
 
 writeFileSync(join(HERE, theme === "light" ? "index-light.html" : "index.html"), k.pageHtml({ title: "The handler tree — signal box", theme, body, script: kitScript() + live }));

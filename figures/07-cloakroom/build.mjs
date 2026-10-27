@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import * as k from "../../kit/iso-kit.mjs";
 import * as G from "../../kit/lathe.mjs";
 import { kitScript } from "../../scripts/inline-kit.mjs";
+import { pdfButton } from "../../kit/pdf-button.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const theme = process.argv.includes("--light") ? "light" : "dark";
@@ -244,14 +245,14 @@ const svg = k.figureSvg({
     "A cloakroom counter drawn as a freshness and size rig: a base plate carries a long counter with a ticket window and tray, an Expires calendar stand, a comparator dial with two pointers and a gear, a green return lamp, a plunger folding press with a knurled knob, and an out tray. A rail on two posts holds five coats on hangers, each with a numbered claim tag. Handing in a ticket turns the pointers: a match lights the lamp and the same ticket goes back, a mismatch takes the coat down, presses it thinner and hands it out.",
   body: [
     floor(),
-    counter(),
-    rail(),
+    `<g data-part="counter">${counter()}</g>`,
+    `<g data-part="rail">${rail()}</g>`,
     ...SLOTS.flatMap((s, i) => [coatStatic(s), coatBody(s, TAGS[i], i)]),
-    calendar(),
-    comparator(),
-    lamp(),
-    press(),
-    outTray(),
+    `<g data-part="calendar">${calendar()}</g>`,
+    `<g data-part="comparator">${comparator()}</g>`,
+    `<g data-part="lamp">${lamp()}</g>`,
+    `<g data-part="press">${press()}</g>`,
+    `<g data-part="outtray">${outTray()}</g>`,
     `<g data-part="live"></g>`,
   ],
 });
@@ -446,7 +447,7 @@ const body = k.plateHtml({
   ],
   caption:
     "The cloakroom keeps no spare copies: freshness is left to HTTP itself. A coat's tag is its ETag — a checksum of Modified and Length — so a ticket that still matches gets the very same ticket back as 304 Not Modified and the coat stays on the rail. A stale ticket brings the coat down and the press hands it out folded — brotli, gzip or zstd, whichever Accept-Encoding admits — while the Expires card on the counter says how long a client may trust what it holds.",
-  body: `<div class="iso-stage" tabindex="0" role="slider" aria-label="Cloakroom: keys 1 to 5 hand in a claim ticket" aria-valuemin="1" aria-valuemax="5" aria-valuenow="1">${svg}</div>`,
+  body: `${pdfButton(`cloakroom-detailed-a4.pdf`)}<div class="iso-stage" tabindex="0" role="slider" aria-label="Cloakroom: keys 1 to 5 hand in a claim ticket" aria-valuemin="1" aria-valuemax="5" aria-valuenow="1">${svg}</div>`,
 });
 
 writeFileSync(join(HERE, theme === "light" ? "index-light.html" : "index.html"), k.pageHtml({ title: "Freshness and size — the cloakroom", theme, body, script: kitScript() + live }));

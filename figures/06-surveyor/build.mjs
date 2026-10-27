@@ -5,6 +5,7 @@ import * as k from "../../kit/iso-kit.mjs";
 import * as G from "../../kit/lathe.mjs";
 import { tubePieces, tubeSvg } from "../../kit/tube.mjs";
 import { kitScript } from "../../scripts/inline-kit.mjs";
+import { pdfButton } from "../../kit/pdf-button.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const theme = process.argv.includes("--light") ? "light" : "dark";
@@ -233,14 +234,14 @@ const svg = k.figureSvg({
   body: [
     base(),
     plinth(),
-    machineA(),
-    machineB(),
-    machineC(),
-    theodolite(),
-    table(),
+    `<g data-part="machine-a">${machineA()}</g>`,
+    `<g data-part="machine-b">${machineB()}</g>`,
+    `<g data-part="machine-c">${machineC()}</g>`,
+    `<g data-part="theodolite">${theodolite()}</g>`,
+    `<g data-part="table">${table()}</g>`,
     drawings(),
-    instrumentCase(),
-    staffRack(),
+    `<g data-part="case">${instrumentCase()}</g>`,
+    `<g data-part="staff">${staffRack()}</g>`,
     `<g data-part="pole" transform="${k.translateAlong(P, [0, 0, 0])}">${S(k.cylinder(A.x + A.w / 2, A.y + A.d + 3, 0.8, PLINTH_H, 24, P, 10), { tone: "hi", crease: "none" })}${S(k.cylinder(A.x + A.w / 2, A.y + A.d + 3, 1.4, PLINTH_H + 24, 2.2, P, 14), { tone: "hi", lit: true })}</g>`,
     `<g data-part="carriage" transform="${k.translateAlong(P, [0, 0, 0])}">${S(k.slabOf({ x: SHEET.x + CELL_W / 2 - 5, y: SHEET.y - 4, w: 10, d: SHEET.d + 8, r: 1 }, TABLE_TOP + TABLE_H + 3.2, 3.4, P, 2, 0.4), { tone: "hi", crease: "lo" })}${S(k.cylinder(SHEET.x + CELL_W / 2, SHEET.y + SHEET.d / 2, 0.5, TABLE_TOP + TABLE_H + 0.7, 3.3, P, 8), { tone: "hi", crease: "none", lit: true })}</g>`,
     `<g data-part="cables">${cable([[POD[0] + 6, POD[1] + 2, SCOPE_Z - 2], [POD[0] + 16, 22, 1.2], [-26, 22, 1.2], [-26, -24, 1.2], [-21, -24, 1.8]])}${cable([[-15, -24, 2], [-11.5, -14, 2], [-11.5, -8, 3], [-11.5, -8, 21], [-8, -8, 25.4]])}</g>`,
@@ -339,7 +340,7 @@ const body = k.plateHtml({
   ],
   caption:
     "ApiDescription crawls the live handler tree — concerns, then layout, then service methods — instead of a parallel description. The document is drawn from what actually answers, its schemas come from the same serializer options you serve with, and it is cached with a checksum and served content-negotiated as JSON or YAML.",
-  body: `<div class="iso-stage" tabindex="0" role="slider" aria-label="OpenAPI surveyor: arrow keys aim at a machine" aria-valuemin="1" aria-valuemax="3" aria-valuenow="1">${svg}</div>`,
+  body: `${pdfButton(`surveyor-detailed-a4.pdf`)}<div class="iso-stage" tabindex="0" role="slider" aria-label="OpenAPI surveyor: arrow keys aim at a machine" aria-valuemin="1" aria-valuemax="3" aria-valuenow="1">${svg}</div>`,
 });
 
 writeFileSync(join(HERE, theme === "light" ? "index-light.html" : "index.html"), k.pageHtml({ title: "The OpenAPI generator", theme, body, script: kitScript() + live }));
